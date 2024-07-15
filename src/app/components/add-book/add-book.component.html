@@ -1,0 +1,26 @@
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-12">
+      <h2>Add New Book</h2>
+      <form [formGroup]="bookForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input id="name" formControlName="name" class="form-control" />
+        </div>
+        <div class="mb-3">
+          <label for="author" class="form-label">Author</label>
+          <input id="author" formControlName="author" class="form-control" />
+        </div>
+        <div class="mb-3">
+          <label for="price" class="form-label">Price</label>
+          <input id="price" formControlName="price" class="form-control" />
+        </div>
+        <div class="mb-3">
+          <label for="summary" class="form-label">Summary</label>
+          <textarea id="summary" formControlName="summary" class="form-control"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="!bookForm.valid">Add Book</button>
+      </form>
+    </div>
+  </div>
+</div>

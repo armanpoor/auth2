@@ -1,13 +1,23 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { AuthService } from './services/auth.service';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css'],
+  standalone: true,
+  imports: [RouterModule, CommonModule],
 })
 export class AppComponent {
-  title = 'auth2';
+  constructor(public authService: AuthService) {}
+
+  async onLogout() {
+    try {
+      await this.authService.logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  }
 }
