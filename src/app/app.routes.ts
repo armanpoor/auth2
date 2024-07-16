@@ -1,18 +1,31 @@
 import { Routes } from '@angular/router';
-import { BookListComponent } from './user/book-list/book-list.component';
-import { BookDetailsComponent } from './user/book-details/book-details.component';
-import { AddBookComponent } from './components/add-book/add-book.component';
 import { LoginComponent } from './components/login/login.component';
+import { BookListComponent } from './admin/book-list/book-list.component';
+import { AddBookComponent } from './admin/add-book/add-book.component';
+import { EditBookComponent } from './admin/edit-book/edit-book.component';
+import { AdminComponent } from './admin/admin.component';
+import { UserComponent } from './user/user.component';
+import { BookDetailsComponent } from './admin/book-details/book-details.component';
 import { AuthGuard } from './guards/auth.guard';
-import { AdminGuard } from './guards/admin.guard';
+import { AdminGuard } from './admin/admin.guard';
 
-export const appRoutes: Routes = [
-  { path: '', component: BookListComponent, canActivate: [AuthGuard] },
+export const routes: Routes = [
+  { path: '', component: LoginComponent },
   {
-    path: 'book/:id',
-    component: BookDetailsComponent,
-    canActivate: [AuthGuard],
+    path: 'admin',
+    component: AdminComponent,
+    canActivate: [AuthGuard, AdminGuard],
+    children: [
+      { path: '', component: BookListComponent },
+      { path: 'add-book', component: AddBookComponent },
+      { path: 'edit-book/:id', component: EditBookComponent },
+      { path: 'book-details/:id', component: BookDetailsComponent },
+    ],
   },
-  { path: 'admin', component: AddBookComponent, canActivate: [AdminGuard] },
-  { path: 'login', component: LoginComponent },
+  {
+    path: 'user',
+    component: UserComponent,
+    canActivate: [AuthGuard],
+    children: [{ path: 'book-details/:id', component: BookDetailsComponent }],
+  },
 ];

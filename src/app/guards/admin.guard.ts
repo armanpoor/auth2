@@ -8,9 +8,9 @@ import { AuthService } from '../services/auth.service';
 export class AdminGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router) {}
 
-  canActivate(): boolean {
+  async canActivate(): Promise<boolean> {
     const user = this.authService.getCurrentUser();
-    if (user && this.authService.isAdmin(user)) {
+    if (user && (await this.authService.isAdmin(user))) {
       return true;
     } else {
       this.router.navigate(['/']);

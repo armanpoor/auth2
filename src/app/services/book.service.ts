@@ -51,4 +51,21 @@ export class BookService {
     }
     return data as Book;
   }
+
+  async updateBook(id: number, updates: any): Promise<void> {
+    const { error } = await this.supabase
+      .from('books')
+      .update(updates)
+      .eq('id', id);
+    if (error) {
+      console.error('Error updating book:', error.message);
+    }
+  }
+
+  async deleteBook(id: number): Promise<void> {
+    const { error } = await this.supabase.from('books').delete().eq('id', id);
+    if (error) {
+      console.error('Error deleting book:', error.message);
+    }
+  }
 }

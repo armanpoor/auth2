@@ -24,8 +24,11 @@ export class BookListComponent implements OnInit {
     }
   }
 
-  async onDelete(id: string) {
-    if (confirm('Are you sure you want to delete this book?')) {
+  async onDelete(id: number | undefined) {
+    if (
+      confirm('Are you sure you want to delete this book?') &&
+      id !== undefined
+    ) {
       await this.bookService.deleteBook(id);
       this.books = await this.bookService.getAllBooks();
     }

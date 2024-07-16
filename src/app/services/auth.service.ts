@@ -19,6 +19,7 @@ interface AuthResponse {
 @Injectable({
   providedIn: 'root',
 })
+
 export class AuthService {
   private currentUser: AuthUser | null = null;
   private supabase: SupabaseClient;
@@ -79,7 +80,7 @@ export class AuthService {
       throw error;
     }
     if (data.user) {
-      if (this.isAdmin(data.user)) {
+      if (await this.isAdmin(data.user)) {
         this.router.navigate(['/admin']);
       } else {
         this.router.navigate(['/']);
@@ -100,11 +101,27 @@ export class AuthService {
     return this.session?.user || null;
   }
 
-  isAdmin(user = this.getCurrentUser()): boolean {
-    if (user) {
-      const role = user.user_metadata?.['role'];
-      return role === 'admin';
+  /**
+   * Checks if the given user is an admin.
+   *
+   * @param {AuthUser} user - The user to check.
+   * @return {Promise<boolean>} A promise that resolves to true if the user is an admin, false otherwise.
+   */
+  async isAdmin(user: AuthUser): Promise<boolean> {
+    const { data: currentUser, error } = await this.supabase.auth.getUser();
+    if (error) {
+      console.error('Error fetching user:', error.message);
+      return false;
     }
-    return false;
+    const { data: roles, error: rolesError } = await this.supabase
+      .from('user_roles')
+      .select('role_id')
+      .eq('user_id', currentUser?.user);
+    if (rolesError) {
+      console.error('Error fetching roles:', rolesError.message);
+      return false;
+    }
+    const isAdmin = roles?.some((role) => role.role_id === 'admin');
+    return !!isAdmin;
   }
 }

@@ -5,7 +5,7 @@
       <span>{{ book.name }}</span>
       <span>
         <a [routerLink]="['/admin/edit-book', book.id]" class="btn btn-warning btn-sm">Edit</a>
-        <button (click)="onDelete(book.id)" class="btn btn-danger btn-sm">Delete</button>
+        <button *ngIf="book.id" (click)="onDelete(book.id)" class="btn btn-danger btn-sm">Delete</button>
       </span>
     </li>
   </ul>
