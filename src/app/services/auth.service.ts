@@ -16,7 +16,6 @@ interface AuthResponse {
   };
   error: any;
 }
-
 @Injectable({
   providedIn: 'root',
 })
@@ -70,7 +69,7 @@ export class AuthService {
     }
   }
 
-  async login(email: string, password: string): Promise<void> {
+  async login(email: string, password: string): Promise<any> {
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
       password,

@@ -1,34 +1,27 @@
-<div class="container mt-5">
-  <div class="row">
-    <div class="col-12">
-      <h2>Login</h2>
-      <form (ngSubmit)="onLogin()">
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input
-            id="email"
-            [(ngModel)]="email"
-            name="email"
-            type="email"
-            class="form-control"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label for="password" class="form-label">Password</label>
-          <input
-            id="password"
-            [(ngModel)]="password"
-            name="password"
-            type="password"
-            class="form-control"
-            required
-          />
-        </div>
-        <button type="submit" (click)="onLogin()" class="btn btn-primary">
-          Login
-        </button>
-      </form>
-    </div>
-  </div>
+<!-- login.component.html -->
+
+<div class="login-form">
+  <h2>Login</h2>
+  <form (ngSubmit)="login()">
+    <label>Email:</label>
+    <input type="email" name="email" [(ngModel)]="email" required>
+
+    <label>Password:</label>
+    <input type="password" name="password" [(ngModel)]="password" required>
+
+    <button type="submit">Login</button>
+  </form>
+</div>
+
+<div class="register-form">
+  <h2>Register</h2>
+  <form (ngSubmit)="register()">
+    <label>Email:</label>
+    <input type="email" name="registrationEmail" [(ngModel)]="registrationEmail" required>
+
+    <label>Password:</label>
+    <input type="password" name="registrationPassword" [(ngModel)]="registrationPassword" required>
+
+    <button type="submit">Register</button>
+  </form>
 </div>
