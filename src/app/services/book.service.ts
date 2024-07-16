@@ -6,6 +6,7 @@ import { Book } from '../models/book';
 @Injectable({
   providedIn: 'root',
 })
+
 export class BookService {
   private supabase: SupabaseClient;
 
