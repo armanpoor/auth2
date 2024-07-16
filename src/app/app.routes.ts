@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { BookListComponent } from './components/book-list/book-list.component';
-import { BookDetailsComponent } from './components/book-details/book-details.component';
+import { BookListComponent } from './user/book-list/book-list.component';
+import { BookDetailsComponent } from './user/book-details/book-details.component';
 import { AddBookComponent } from './components/add-book/add-book.component';
 import { LoginComponent } from './components/login/login.component';
 import { AuthGuard } from './guards/auth.guard';

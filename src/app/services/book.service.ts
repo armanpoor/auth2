@@ -20,8 +20,9 @@ export class BookService {
   async getAllBooks(): Promise<Book[]> {
     const { data, error } = await this.supabase.from('books').select('*');
     if (error) {
-      console.error('Error fetching books:', error);
+      console.error('Error fetching books:', error.message);
       throw error;
+      return [];
     }
     return data as Book[];
   }
