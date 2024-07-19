@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Book } from '../../models/book';
 import { BookService } from '../../services/book.service';
 import { Router, RouterModule } from '@angular/router';
@@ -17,7 +17,11 @@ export class AdminBookListComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription | undefined;
 
-  constructor(private bookService: BookService, private router: Router) {}
+  constructor(
+    private bookService: BookService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
   }
@@ -45,8 +49,10 @@ export class AdminBookListComponent implements OnInit, OnDestroy {
       try {
         await this.bookService.deleteBook(bookId);
         this.loadBooks(); // Refresh the book list
+        this.cdr.detectChanges(); // Manually trigger change detection
       } catch (error) {
         console.error('Error deleting book:', error);
+        this.cdr.detectChanges(); // Manually trigger change detection
       }
     }
   }
@@ -54,8 +60,10 @@ export class AdminBookListComponent implements OnInit, OnDestroy {
   async loadBooks(): Promise<void> {
     try {
       this.books = await this.bookService.getAllBooks();
+      this.cdr.detectChanges(); // Manually trigger change detection
     } catch (error) {
       console.error('Error loading books:', error);
+      this.cdr.detectChanges(); // Manually trigger change detection
     }
   }
 

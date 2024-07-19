@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormsModule,
@@ -17,7 +17,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   registerForm: FormGroup;
   isLoginMode = true;
@@ -25,7 +25,8 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -38,13 +39,16 @@ export class LoginComponent {
       confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
+  ngOnInit(): void {
+    throw new Error('Method not implemented.');
+  }
 
   async onSubmit(): Promise<void> {
+    //login mode
     if (this.isLoginMode) {
       if (this.loginForm.invalid) {
         return;
       }
-
       try {
         const { email, password } = this.loginForm.value;
         const response = await this.authService.signInWithPassword(
@@ -56,21 +60,27 @@ export class LoginComponent {
           console.error('Login error:', response.error.message);
           return;
         }
-
         const isAdmin = await this.authService.isAdmin();
-        if (isAdmin) {
-          this.router.navigate(['/admin/book-list']);
-        } else {
-          this.router.navigate(['/user/book-list']);
+        if (response.user) {
+          console.log('User logged in successfully:', response.user);
+          if (isAdmin) {
+            this.router.navigate(['/admin/book-list']);
+          } else {
+            this.router.navigate(['/user/book-list']);
+          }
         }
+        this.cdr.detectChanges(); // Manually trigger change detection
       } catch (error) {
         console.error('Login failed:', error);
+        this.cdr.detectChanges(); // Manually trigger change detection
       }
-    } else {
+    }
+
+    // Register mode
+    else {
       if (this.registerForm.invalid) {
         return;
       }
-
       const { email, password, confirmPassword } = this.registerForm.value;
       if (password !== confirmPassword) {
         console.error('Passwords do not match');
@@ -86,8 +96,10 @@ export class LoginComponent {
         }
 
         console.log('User registered successfully:', response.user);
+        this.cdr.detectChanges(); // Manually trigger change detection
       } catch (error) {
         console.error('Registration failed:', error);
+        this.cdr.detectChanges(); // Manually trigger change detection
       }
     }
   }

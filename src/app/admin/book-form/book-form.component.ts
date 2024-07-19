@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy, Inject, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Inject,
+  Input,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -15,6 +22,7 @@ import { Book } from '../../models/book';
 })
 export class BookFormComponent implements OnInit, OnDestroy {
   @Input() bookId: number | null = null;
+  errorMessage: string | null = null;
   book: Book = {
     name: '',
     author: '',
@@ -29,7 +37,8 @@ export class BookFormComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     @Inject(BookService) private bookService: BookService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     this.bookForm = this.fb.group({
       name: [''],
@@ -56,15 +65,21 @@ export class BookFormComponent implements OnInit, OnDestroy {
   }
 
   async onSubmit(): Promise<void> {
-    if (this.bookForm.valid) {
-      const bookData = this.bookForm.value;
-      if (this.bookId !== null) {
-        await this.bookService.updateBook(this.bookId, bookData);
-        this.router.navigate(['/admin/book-list']);
-      } else {
-        const bookId = this.bookService.addBook(this.book);
-        this.router.navigate(['/admin/book-list', bookId]);
+    try {
+      if (this.bookForm.valid) {
+        const bookData = this.bookForm.value;
+        if (this.bookId !== null) {
+          await this.bookService.updateBook(this.bookId, bookData);
+          this.router.navigate(['/admin/book-list']);
+        } else {
+          const bookId = await this.bookService.addBook(this.book);
+          this.router.navigate(['/admin/book-list', bookId]);
+        }
+        this.cdr.detectChanges(); // Manually trigger change detection
       }
+    } catch (error) {
+      console.error('Error deleting book:', error);
+      this.cdr.detectChanges(); // Manually trigger change detection
     }
   }
 }
