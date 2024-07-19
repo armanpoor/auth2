@@ -23,6 +23,9 @@ interface AuthResponse {
 export class AuthService {
   private supabase: SupabaseClient;
   private sessionSubject: BehaviorSubject<Session | null>;
+  private userSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+  public user$: Observable<any> = this.userSubject.asObservable();
+
   // private currentUser: AuthUser | null = null;
   // private session: Session | null = null;
   // currentUser: any;
@@ -72,7 +75,20 @@ export class AuthService {
   get session$(): Observable<Session | null> {
     return this.sessionSubject.asObservable();
   }
+  initializeSupabase(): void {
+    // Initialize Supabase client here
+    if (!this.supabase) {
+      this.supabase = createClient(
+        environment.supabaseUrl,
+        environment.supabaseKey
+      );
+    }
 
+    // Set up authentication state change listener
+    this.supabase.auth.onAuthStateChange((event, session) => {
+      this.sessionSubject.next(session);
+    });
+  }
   async signInWithPassword(email: string, password: string) {
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
@@ -155,5 +171,10 @@ export class AuthService {
     const isAdmin = roles?.some((role) => role.role_id === 2);
     console.log('Is admin:', isAdmin);
     return !!isAdmin;
+  }
+
+  isAuthenticated(): boolean {
+    // You can implement a more robust check if needed
+    return this.userSubject.value !== null;
   }
 }

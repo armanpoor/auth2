@@ -1,3 +1,14 @@
+<!-- Loading Spinner or Splash Screen -->
+<div *ngIf="loading" class="loading-container">
+  <div class="spinner">
+    <!-- You can use a CSS spinner or an image here -->
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+</div>
+
+<!-- header and navbar-->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="/">Book Store</a>
@@ -16,6 +27,7 @@
     </div>
   </div>
 </nav>
+<!-- Main Application Content -->
 <div class="container">
   <router-outlet></router-outlet>
 </div>

@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from './services/auth.service';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,10 +10,23 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [RouterModule, CommonModule],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  loading = true;
   title = 'irisa-armanpoor-bookStore';
-  constructor(public authService: AuthService) {}
+  constructor(public authService: AuthService, private router: Router) {}
+  ngOnInit(): void {
+    // Ensure the application is initialized before making Supabase requests
+    this.initializeApp();
+  }
+  private initializeApp(): void {
+    // Initialize Supabase after the page load
+    this.authService.initializeSupabase();
 
+    // Simulate initialization delay
+    setTimeout(() => {
+      this.loading = false;
+    }, 10000); // Adjust the timeout as needed
+  }
   async onLogout() {
     try {
       await this.authService.logout();
