@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Book } from '../../models/book';
 import { BookService } from '../../services/book.service';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-book-list',
@@ -11,10 +12,15 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [RouterModule, CommonModule],
 })
-export class BookListComponent implements OnInit {
+
+export class UserBookListComponent implements OnInit, OnDestroy {
   books: Book[] = [];
+  private subscription: Subscription | undefined;
 
   constructor(private bookService: BookService) {}
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
 
   ngOnInit(): void {
     this.bookService.getAllBooks().then(

@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Book } from '../../models/book';
 import { BookService } from '../../services/book.service';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-book-list',
@@ -11,26 +12,53 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [RouterModule, CommonModule],
 })
-export class BookListComponent implements OnInit {
+export class AdminBookListComponent implements OnInit, OnDestroy {
   books: Book[] = [];
 
-  constructor(private bookService: BookService) {}
+  private subscription: Subscription | undefined;
 
-  async ngOnInit(): Promise<void> {
+  constructor(private bookService: BookService, private router: Router) {}
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  ngOnInit(): void {
     try {
-      this.books = await this.bookService.getAllBooks();
+      this.loadBooks();
     } catch (error) {
       console.error('Error fetching books', error);
     }
   }
 
-  async onDelete(id: number | undefined) {
-    if (
-      confirm('Are you sure you want to delete this book?') &&
-      id !== undefined
-    ) {
-      await this.bookService.deleteBook(id);
-      this.books = await this.bookService.getAllBooks();
+  // async onDelete(bookid: number | undefined) {
+  //   if (
+  //     confirm('Are you sure you want to delete this book?') &&
+  //     bookid !== undefined
+  //   ) {
+  //     await this.bookService.deleteBook(bookid);
+  //     this.books = await this.bookService.getAllBooks();
+  //   }
+  // }
+
+  onDelete(bookId: number): void {
+    if (confirm('Are you sure you want to delete this book?')) {
+      this.bookService
+        .deleteBook(bookId)
+        .then(() => {
+          this.books = this.books.filter((book) => book.id !== bookId);
+        })
+        .catch((error) => {
+          alert(`Error deleting book: ${error.message}`);
+        });
     }
+  }
+
+  loadBooks(): void {
+    this.bookService.getAllBooks().then((data) => {
+      this.books = data;
+    });
+  }
+  onEdit(bookId: number): void {
+    this.router.navigate(['/admin/book-form', bookId]);
   }
 }

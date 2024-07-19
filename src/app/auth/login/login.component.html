@@ -1,0 +1,69 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center">
+          <h3>{{ isLoginMode ? 'Login' : 'Register' }}</h3>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="isLoginMode ? loginForm : registerForm" (ngSubmit)="onSubmit()">
+            <div class="form-group mb-3">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                class="form-control"
+                [ngClass]="{ 'is-invalid': (isLoginMode ? loginForm : registerForm).get('email')?.touched && (isLoginMode ? loginForm : registerForm).get('email')?.invalid }"
+                autocomplete="email"
+              />
+              <div class="invalid-feedback" *ngIf="(isLoginMode ? loginForm : registerForm).get('email')?.touched && (isLoginMode ? loginForm : registerForm).get('email')?.errors?.['required']">
+                <div *ngIf="(isLoginMode ? loginForm : registerForm).get('email')?.errors?.['required']">Email is required</div>
+                <div *ngIf="(isLoginMode ? loginForm : registerForm).get('email')?.errors?.['email']">Enter a valid email</div>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                formControlName="password"
+                class="form-control"
+                [ngClass]="{ 'is-invalid': (isLoginMode ? loginForm : registerForm).get('password')?.touched && (isLoginMode ? loginForm : registerForm).get('password')?.invalid }"
+                autocomplete="current-password"
+              />
+              <div class="invalid-feedback" *ngIf="(isLoginMode ? loginForm : registerForm).get('password')?.touched && (isLoginMode ? loginForm : registerForm).get('password')?.errors?.['required']">
+                <div *ngIf="(isLoginMode ? loginForm : registerForm).get('password')?.errors?.['required']">Password is required</div>
+                <div *ngIf="(isLoginMode ? loginForm : registerForm).get('password')?.errors?.['minlength']">Password must be at least 6 characters</div>
+              </div>
+            </div>
+
+            <div *ngIf="!isLoginMode" class="form-group mb-3">
+              <label for="confirmPassword">Confirm Password</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                class="form-control"
+                [ngClass]="{ 'is-invalid': registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.invalid }"
+                autocomplete="new-password"
+              />
+              <div class="invalid-feedback" *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.errors?.['required']">
+                <div *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Confirm Password is required</div>
+                <div *ngIf="registerForm.get('confirmPassword')?.errors?.['minlength']">Password must be at least 6 characters</div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">{{ isLoginMode ? 'Login' : 'Register' }}</button>
+          </form>
+        </div>
+        <div class="card-footer text-center">
+          <button class="btn btn-link" (click)="toggleMode()">
+            {{ isLoginMode ? 'Switch to Register' : 'Switch to Login' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

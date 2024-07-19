@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
   imports: [RouterModule, CommonModule],
 })
 export class AppComponent {
+  title = 'irisa-armanpoor-bookStore';
   constructor(public authService: AuthService) {}
 
   async onLogout() {

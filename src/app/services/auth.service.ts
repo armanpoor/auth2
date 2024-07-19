@@ -30,6 +30,7 @@ export class AuthService {
       environment.supabaseUrl,
       environment.supabaseKey
     );
+
     this.supabase.auth
       .getSession()
       .then((res) => {
@@ -38,6 +39,7 @@ export class AuthService {
       .catch((error) => {
         console.error('Error getting session:', error);
       });
+
     this.supabase.auth.onAuthStateChange((_event, session: Session | null) => {
       if (session) {
         this.session = session;
@@ -47,26 +49,19 @@ export class AuthService {
       }
     });
   }
-  async registerUser(
-    email: string,
-    password: string
-  ): Promise<AuthUser | null> {
-    try {
-      const { data, error }: AuthResponse = await this.supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      this.currentUser = data.user; // Store current user in service
-
-      return data.user; // Return the user object upon successful registration
-    } catch (error) {
-      throw error;
-    }
+  async signInWithPassword(email: string, password: string) {
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return { user: data.user, error };
+  }
+  async registerUser(email: string, password: string) {
+    const { data, error } = await this.supabase.auth.signUp({
+      email,
+      password,
+    });
+    return { user: data.user, error };
   }
 
   async login(email: string, password: string): Promise<any> {
@@ -121,12 +116,12 @@ export class AuthService {
       .eq('user_id', currentUser?.user);
     if (rolesError) {
       // Log an error if there was an issue fetching the roles
-      console.error('Error fetching roles:', rolesError.message);
+      console.error('Error fetching user role:', rolesError.message);
       return false;
     }
 
     // Check if any of the roles is 'admin'
-    const isAdmin = roles?.some((role) => role.role_id === 'admin');
+    const isAdmin = roles?.some((role) => role.role_id === 2);
     return !!isAdmin;
   }
 }
