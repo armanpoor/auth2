@@ -9,8 +9,8 @@ export const adminRoutes: Routes = [
     canActivate: [AdminGuard],
     children: [
       { path: 'book-list', component: AdminBookListComponent },
-      { path: 'book-form/:id', component: BookFormComponent },
-      { path: 'book-form', component: BookFormComponent },
+      { path: 'books/new', component: BookFormComponent },
+      { path: 'books/edit/:id', component: BookFormComponent },
     ],
   },
 ];

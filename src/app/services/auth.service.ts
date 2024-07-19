@@ -35,6 +35,7 @@ export class AuthService {
       .getSession()
       .then((res) => {
         this.session = res.data?.session || null;
+        console.log('Session:', this.session);
       })
       .catch((error) => {
         console.error('Error getting session:', error);
@@ -43,6 +44,7 @@ export class AuthService {
     this.supabase.auth.onAuthStateChange((_event, session: Session | null) => {
       if (session) {
         this.session = session;
+        console.log('Auth state changed:', this.session);
       } else {
         this.session = null;
         console.error('Error getting session:', Error);
@@ -54,6 +56,7 @@ export class AuthService {
       email,
       password,
     });
+    console.log('Sign in response:', { data, error });
     return { user: data.user, error };
   }
   async registerUser(email: string, password: string) {
@@ -61,6 +64,7 @@ export class AuthService {
       email,
       password,
     });
+    console.log('Register response:', { data, error });
     return { user: data.user, error };
   }
 
@@ -69,6 +73,7 @@ export class AuthService {
       email,
       password,
     });
+    console.log('Login response:', { data, error });
     if (error) {
       console.error('Error logging in:', error);
       throw error;
@@ -92,6 +97,7 @@ export class AuthService {
   }
 
   getCurrentUser() {
+    console.log('Current user:', this.session?.user);
     return this.session?.user || null;
   }
 
@@ -108,6 +114,7 @@ export class AuthService {
       console.error('Error fetching user:', error.message);
       return false;
     }
+    console.log('Current user:', currentUser);
 
     // Fetch the roles of the current user from the 'user_roles' table
     const { data: roles, error: rolesError } = await this.supabase
@@ -119,9 +126,12 @@ export class AuthService {
       console.error('Error fetching user role:', rolesError.message);
       return false;
     }
+    console.log('User roles:', roles);
 
     // Check if any of the roles is 'admin'
     const isAdmin = roles?.some((role) => role.role_id === 2);
+    console.log('Is admin:', isAdmin);
     return !!isAdmin;
   }
 }
+
