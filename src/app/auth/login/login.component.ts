@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormsModule,
@@ -9,6 +9,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -17,10 +18,11 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
   registerForm: FormGroup;
   isLoginMode = true;
+  private authSubscription: Subscription | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -39,8 +41,17 @@ export class LoginComponent implements OnInit {
       confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
+  }
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+    this.authSubscription = this.authService.session$.subscribe((session) => {
+      if (session) {
+        const redirectPath = this.authService.getRedirectPath(session);
+        this.router.navigate([redirectPath]);
+      }
+      this.cdr.detectChanges();
+    });
   }
 
   async onSubmit(): Promise<void> {

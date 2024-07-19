@@ -8,6 +8,7 @@ import {
 } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 interface AuthResponse {
   data: {
@@ -20,9 +21,10 @@ interface AuthResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private currentUser: AuthUser | null = null;
   private supabase: SupabaseClient;
-  private session: Session | null = null;
+  private sessionSubject: BehaviorSubject<Session | null>;
+  // private currentUser: AuthUser | null = null;
+  // private session: Session | null = null;
   // currentUser: any;
 
   constructor(private router: Router) {
@@ -30,27 +32,47 @@ export class AuthService {
       environment.supabaseUrl,
       environment.supabaseKey
     );
+    this.sessionSubject = new BehaviorSubject<Session | null>(null);
 
-    this.supabase.auth
-      .getSession()
-      .then((res) => {
-        this.session = res.data?.session || null;
-        console.log('Session:', this.session);
-      })
-      .catch((error) => {
-        console.error('Error getting session:', error);
-      });
-
-    this.supabase.auth.onAuthStateChange((_event, session: Session | null) => {
-      if (session) {
-        this.session = session;
-        console.log('Auth state changed:', this.session);
-      } else {
-        this.session = null;
-        console.error('Error getting session:', Error);
-      }
+    // Fetch the current session
+    this.supabase.auth.getSession().then(({ data: { session } }) => {
+      this.sessionSubject.next(session);
     });
+
+    // Subscribe to authentication state changes
+    this.supabase.auth.onAuthStateChange((event, session) => {
+      this.sessionSubject.next(session);
+    });
+    // this.supabase.auth
+    //   .getSession()
+    //   .then((res) => {
+    //     this.session = res.data?.session || null;
+    //     console.log('Session:', this.session);
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error getting session:', error);
+    //   });
+
+    // this.supabase.auth.onAuthStateChange((_event, session: Session | null) => {
+    //   if (session) {
+    //     this.session = session;
+    //     console.log('Auth state changed:', this.session);
+    //   } else {
+    //     this.session = null;
+    //     console.error('Error getting session:', Error);
+    //   }
+    // });
   }
+
+  /**
+   * Getter for the session subject observable.
+   *
+   * @return {Observable<Session | null>} The session subject observable.
+   */
+  get session$(): Observable<Session | null> {
+    return this.sessionSubject.asObservable();
+  }
+
   async signInWithPassword(email: string, password: string) {
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
@@ -96,9 +118,10 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  getCurrentUser() {
-    console.log('Current user:', this.session?.user);
-    return this.session?.user || null;
+  getRedirectPath(session: Session | null): string {
+    if (!session) return '/';
+    const userRole = session.user?.role; // Replace with actual role retrieval logic
+    return userRole === 'admin' ? '/admin' : '/user';
   }
 
   /**
@@ -134,4 +157,3 @@ export class AuthService {
     return !!isAdmin;
   }
 }
-
