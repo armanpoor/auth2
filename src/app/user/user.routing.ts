@@ -8,7 +8,6 @@ export const userRoutes: Routes = [
     path: 'user',
     component: UserComponent,
     children: [
-      { path: '', redirectTo: 'book-list', pathMatch: 'full' },
       { path: 'book-list', component: UserBookListComponent },
       { path: 'book-details/:id', component: BookDetailsComponent },
     ],

@@ -1,12 +1,20 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { routes } from './app.routes';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { adminRoutes } from './admin/admin.routing';
+import { userRoutes } from './user/user.routing';
+import { LoginComponent } from './auth/login/login.component';
 import { provideHttpClient } from '@angular/common/http';
+import { provideZoneChangeDetection } from '@angular/core';
 
-export const appConfig: ApplicationConfig = {
+const routes = [
+  { path: '', component: LoginComponent },
+  ...adminRoutes,
+  ...userRoutes,
+];
+
+export const appConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(),
   ],
 };
