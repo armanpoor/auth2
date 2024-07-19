@@ -22,7 +22,7 @@ export class AdminBookListComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     try {
       this.loadBooks();
     } catch (error) {
@@ -40,24 +40,25 @@ export class AdminBookListComponent implements OnInit, OnDestroy {
   //   }
   // }
 
-  onDelete(bookId: number): void {
+  async onDelete(bookId: number): Promise<void> {
     if (confirm('Are you sure you want to delete this book?')) {
-      this.bookService
-        .deleteBook(bookId)
-        .then(() => {
-          this.books = this.books.filter((book) => book.id !== bookId);
-        })
-        .catch((error) => {
-          alert(`Error deleting book: ${error.message}`);
-        });
+      try {
+        await this.bookService.deleteBook(bookId);
+        this.loadBooks(); // Refresh the book list
+      } catch (error) {
+        console.error('Error deleting book:', error);
+      }
     }
   }
 
-  loadBooks(): void {
-    this.bookService.getAllBooks().then((data) => {
-      this.books = data;
-    });
+  async loadBooks(): Promise<void> {
+    try {
+      this.books = await this.bookService.getAllBooks();
+    } catch (error) {
+      console.error('Error loading books:', error);
+    }
   }
+
   onEdit(bookId: number): void {
     this.router.navigate(['/admin/book-form', bookId]);
   }

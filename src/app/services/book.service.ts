@@ -17,17 +17,20 @@ export class BookService {
 
   // Get all books
   async getAllBooks(): Promise<any[]> {
-    const { data, error } = await this.supabase.from('books').select('*');
+    try {
+      const { data, error } = await this.supabase.from('books').select('*');
 
-    if (error) {
+      if (error) {
+        throw error;
+      }
+
+      return data || [];
+    } catch (error) {
       console.error('Error fetching books:', error);
-      return [];
+      return []; // Return empty array in case of error
     }
-
-    return data;
   }
 
-  // Get a single book by ID
   async getBookById(id: number): Promise<any> {
     const { data, error } = await this.supabase
       .from('books')
@@ -39,7 +42,6 @@ export class BookService {
       console.error('Error fetching book:', error);
       return null;
     }
-
     return data;
   }
 
